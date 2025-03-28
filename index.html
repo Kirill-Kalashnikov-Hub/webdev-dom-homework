@@ -2,7 +2,6 @@
 <html>
   <head>
     <title>Проект "Комменты"</title> 
-    
     <meta charset="utf-8" />
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -66,7 +65,84 @@
 
   <script>
     "use strict";
-    // Код писать здесь
-    console.log("It works!");
+// Получаем элементы
+const nameInput = document.querySelector(".add-form-name");
+    const commentInput = document.querySelector(".add-form-text");
+    const addButton = document.querySelector(".add-form-button");
+    const commentsList = document.querySelector(".comments"); // Получаем список комментариев
+
+    // Функция для получения текущей даты и времени в нужном формате
+    function getCurrentDateTime() {
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0'); // Месяцы начинаются с 0
+      const year = now.getFullYear();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+
+      return `${day}.${month}.${year} ${hours}:${minutes}`;
+    }
+
+    // Функция-обработчик события для поля "Имя"
+    function handleNameInputChange() {
+       console.log("Имя изменено:", nameInput.value); 
+    }
+
+    // Функция-обработчик события для поля "Комментарий"
+    function handleCommentInputChange() {
+       console.log("Комментарий изменен:", commentInput.value); 
+    }
+
+    // Функция-обработчик события для кнопки "Написать"
+    function handleAddButtonClick() {
+      const name = nameInput.value.trim();
+      const comment = commentInput.value.trim();
+
+      // Проверка на пустые поля
+      if (name === "" || comment === "") {
+        alert("Пожалуйста, заполните все поля!");
+        return; 
+      }
+
+      // Получаем текущую дату и время
+      const dateTime = getCurrentDateTime();
+
+      // Создаем шаблонную строку комментария
+      const commentHTML = `
+        <li class="comment">
+          <div class="comment-header">
+            <div>${name}</div>
+            <div>${dateTime}</div>
+          </div>
+          <div class="comment-body">
+            <div class="comment-text">
+              ${comment}
+            </div>
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">0</span>
+              <button class="like-button"></button>
+            </div>
+          </div>
+        </li>
+      `;
+
+      // Добавляем новый комментарий в список
+      commentsList.innerHTML = commentsList.innerHTML + commentHTML;
+
+      // Очищаем поля ввода
+      nameInput.value = "";
+      commentInput.value = "";
+    }
+
+    // Добавляем обработчики события 'input' на поля ввода
+    nameInput.addEventListener("input", handleNameInputChange);
+    commentInput.addEventListener("input", handleCommentInputChange);
+
+    // Добавляем обработчик события 'click' на кнопку "Написать"
+    addButton.addEventListener("click", handleAddButtonClick);
+
+    
   </script>
 </html>
