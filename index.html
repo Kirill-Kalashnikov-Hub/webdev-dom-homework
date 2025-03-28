@@ -2,7 +2,6 @@
 <html>
   <head>
     <title>Проект "Комменты"</title> 
-    
     <meta charset="utf-8" />
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -66,7 +65,194 @@
 
   <script>
     "use strict";
-    // Код писать здесь
-    console.log("It works!");
+// Получаем элементы
+const nameInput = document.querySelector(".add-form-name");
+    const commentInput = document.querySelector(".add-form-text");
+    const addButton = document.querySelector(".add-form-button");
+    const commentsList = document.querySelector(".comments");
+
+    // Массив для хранения комментариев
+    let comments = [
+      {
+        name: "Глеб Фокин",
+        date: "12.02.22 12:18",
+        text: "Это будет первый комментарий на этой странице",
+        likes: 3,
+        isLiked: false,
+      },
+      {
+        name: "Варвара Н.",
+        date: "13.02.22 19:22",
+        text: "Мне нравится как оформлена эта страница! ❤",
+        likes: 75,
+        isLiked: true,
+      },
+    ];
+
+    // Функция для экранирования HTML
+    function escapeHTML(str) {
+      return str
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    // Функция для получения текущей даты и времени
+    function getCurrentDateTime() {
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, "0");
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const year = now.getFullYear();
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      return `${day}.${month}.${year} ${hours}:${minutes}`;
+    }
+
+    // Функция для рендеринга комментариев на странице
+    function renderComments() {
+      commentsList.innerHTML = "";
+
+      comments.forEach((comment, index) => {
+        const commentHTML = `
+          <li class="comment">
+            <div class="comment-header">
+              <div>${escapeHTML(comment.name)}</div>
+              <div>${comment.date}</div>
+            </div>
+            <div class="comment-body">
+              <div class="comment-text" data-index="${index}">
+                ${escapeHTML(comment.text)}
+              </div>
+            </div>
+            <div class="comment-footer">
+              <div class="likes">
+                <span class="likes-counter">${comment.likes}</span>
+                <button class="like-button ${
+                  comment.isLiked ? "-active-like" : ""
+                }" data-index="${index}"></button>
+              </div>
+            </div>
+          </li>
+        `;
+        commentsList.innerHTML += commentHTML;
+      });
+
+      // Добавляем обработчики событий
+      document.querySelectorAll(".like-button").forEach((button) => {
+        button.addEventListener("click", handleLikeClick);
+      });
+
+      document.querySelectorAll(".comment-text").forEach((commentText) => {
+        commentText.addEventListener("click", handleCommentClick);
+      });
+    }
+
+    // Обработчик клика на лайк
+    function handleLikeClick(event) {
+      event.stopPropagation(); 
+      const index = event.target.dataset.index;
+      comments[index].isLiked = !comments[index].isLiked;
+      comments[index].likes += comments[index].isLiked ? 1 : -1;
+      renderComments();
+    }
+
+    // Обработчик клика на комментарий
+    function handleCommentClick(event) {
+      const index = event.target.dataset.index;
+      const comment = comments[index];
+      nameInput.value = comment.name;
+      commentInput.value = `> ${comment.text}\n`;
+    }
+
+    // Обработчики полей ввода
+    function handleNameInputChange() {
+      nameInput.value = escapeHTML(nameInput.value);
+    }
+
+    // Обработчики полей ввода
+    function handleNameInputChange() {
+      nameInput.value = escapeHTML(nameInput.value);
+    }
+
+    function handleCommentInputChange() {
+      commentInput.value = escapeHTML(commentInput.value);
+    }
+
+    // Обработчик отправки формы
+    function handleAddButtonClick() {
+      let name = nameInput.value.trim();
+      let text = commentInput.value.trim();
+
+      if (!name || !text) {
+        alert("Заполните все поля!");
+        return;
+      }
+
+      name = escapeHTML(name);
+      text = escapeHTML(text);
+
+      comments.push({
+        name: name,
+        date: getCurrentDateTime(),
+        text: text,
+        likes: 0,
+        isLiked: false,
+      });
+
+      renderComments();
+      nameInput.value = "";
+      commentInput.value = "";
+    }
+
+    // Привязка обработчиков
+    nameInput.addEventListener("input", handleNameInputChange);
+    commentInput.addEventListener("input", handleCommentInputChange);
+    addButton.addEventListener("click", handleAddButtonClick);
+
+    renderComments();
+
+    renderComments();
+
+    // Рендерим начальные комментарии
+    renderComments();
+    function handleCommentInputChange() {
+      commentInput.value = escapeHTML(commentInput.value);
+    }
+
+    // Обработчик отправки формы
+    function handleAddButtonClick() {
+      let name = nameInput.value.trim();
+      let text = commentInput.value.trim();
+
+      if (!name || !text) {
+        alert("Заполните все поля!");
+        return;
+      }
+
+      name = escapeHTML(name);
+      text = escapeHTML(text);
+
+      comments.push({
+        name: name,
+        date: getCurrentDateTime(),
+        text: text,
+        likes: 0,
+        isLiked: false,
+      });
+
+      renderComments();
+      nameInput.value = "";
+      commentInput.value = "";
+    }
+
+    // Привязка обработчиков
+    nameInput.addEventListener("input", handleNameInputChange);
+    commentInput.addEventListener("input", handleCommentInputChange);
+    addButton.addEventListener("click", handleAddButtonClick);
+
+    // Рендерим начальные комментарии
+    renderComments();
   </script>
 </html>
