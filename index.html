@@ -69,67 +69,118 @@
 const nameInput = document.querySelector(".add-form-name");
     const commentInput = document.querySelector(".add-form-text");
     const addButton = document.querySelector(".add-form-button");
-    const commentsList = document.querySelector(".comments"); // Получаем список комментариев
+    const commentsList = document.querySelector(".comments");
+
+    // Массив для хранения комментариев (включая информацию о лайках)
+    let comments = [
+      {
+        name: "Глеб Фокин",
+        date: "12.02.22 12:18",
+        text: "Это будет первый комментарий на этой странице",
+        likes: 3,
+        isLiked: false,
+      },
+      {
+        name: "Варвара Н.",
+        date: "13.02.22 19:22",
+        text: "Мне нравится как оформлена эта страница! ❤",
+        likes: 75,
+        isLiked: true,
+      },
+    ];
 
     // Функция для получения текущей даты и времени в нужном формате
     function getCurrentDateTime() {
       const now = new Date();
-      const day = String(now.getDate()).padStart(2, '0');
-      const month = String(now.getMonth() + 1).padStart(2, '0'); // Месяцы начинаются с 0
+      const day = String(now.getDate()).padStart(2, "0");
+      const month = String(now.getMonth() + 1).padStart(2, "0");
       const year = now.getFullYear();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
 
       return `${day}.${month}.${year} ${hours}:${minutes}`;
     }
 
+    // Функция для рендеринга комментариев на странице
+    function renderComments() {
+      commentsList.innerHTML = ""; 
+
+      comments.forEach((comment, index) => {
+        const commentHTML = `
+          <li class="comment">
+            <div class="comment-header">
+              <div>${comment.name}</div>
+              <div>${comment.date}</div>
+            </div>
+            <div class="comment-body">
+              <div class="comment-text">
+                ${comment.text}
+              </div>
+            </div>
+            <div class="comment-footer">
+              <div class="likes">
+                <span class="likes-counter">${comment.likes}</span>
+                <button class="like-button ${
+                  comment.isLiked ? "-active-like" : ""
+                }" data-index="${index}"></button>
+              </div>
+            </div>
+          </li>
+        `;
+        commentsList.innerHTML += commentHTML;
+      });
+
+      // Добавляем обработчики клика на кнопки лайков после рендеринга
+      const likeButtons = document.querySelectorAll(".like-button");
+      likeButtons.forEach((button) => {
+        button.addEventListener("click", handleLikeClick);
+      });
+    }
+
+    // Функция-обработчик клика на лайк
+    function handleLikeClick(event) {
+      const index = event.target.dataset.index; 
+      if (comments[index].isLiked) {
+        comments[index].likes--;
+      } else {
+        comments[index].likes++;
+      }
+      comments[index].isLiked = !comments[index].isLiked; 
+      renderComments(); 
+    }
+
     // Функция-обработчик события для поля "Имя"
     function handleNameInputChange() {
-       console.log("Имя изменено:", nameInput.value); 
+      console.log("Имя изменено:", nameInput.value);
     }
 
     // Функция-обработчик события для поля "Комментарий"
     function handleCommentInputChange() {
-       console.log("Комментарий изменен:", commentInput.value); 
+      console.log("Комментарий изменен:", commentInput.value);
     }
 
     // Функция-обработчик события для кнопки "Написать"
     function handleAddButtonClick() {
       const name = nameInput.value.trim();
-      const comment = commentInput.value.trim();
+      const text = commentInput.value.trim();
 
-      // Проверка на пустые поля
-      if (name === "" || comment === "") {
+      if (name === "" || text === "") {
         alert("Пожалуйста, заполните все поля!");
-        return; 
+        return;
       }
 
-      // Получаем текущую дату и время
       const dateTime = getCurrentDateTime();
 
-      // Создаем шаблонную строку комментария
-      const commentHTML = `
-        <li class="comment">
-          <div class="comment-header">
-            <div>${name}</div>
-            <div>${dateTime}</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              ${comment}
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">0</span>
-              <button class="like-button"></button>
-            </div>
-          </div>
-        </li>
-      `;
+      // Добавляем новый комментарий в массив
+      comments.push({
+        name: name,
+        date: dateTime,
+        text: text,
+        likes: 0,
+        isLiked: false,
+      });
 
-      // Добавляем новый комментарий в список
-      commentsList.innerHTML = commentsList.innerHTML + commentHTML;
+      renderComments(); 
 
       // Очищаем поля ввода
       nameInput.value = "";
@@ -143,6 +194,6 @@ const nameInput = document.querySelector(".add-form-name");
     // Добавляем обработчик события 'click' на кнопку "Написать"
     addButton.addEventListener("click", handleAddButtonClick);
 
-    
+    renderComments();
   </script>
 </html>
