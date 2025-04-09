@@ -65,8 +65,9 @@
 
   <script>
     "use strict";
-// Получаем элементы
-const nameInput = document.querySelector(".add-form-name");
+
+    // Получаем элементы
+    const nameInput = document.querySelector(".add-form-name");
     const commentInput = document.querySelector(".add-form-text");
     const addButton = document.querySelector(".add-form-button");
     const commentsList = document.querySelector(".comments");
@@ -118,12 +119,12 @@ const nameInput = document.querySelector(".add-form-name");
         const commentHTML = `
           <li class="comment">
             <div class="comment-header">
-              <div>${escapeHTML(comment.name)}</div>
+              <div>${comment.name}</div>
               <div>${comment.date}</div>
             </div>
             <div class="comment-body">
               <div class="comment-text" data-index="${index}">
-                ${escapeHTML(comment.text)}
+                ${comment.text}
               </div>
             </div>
             <div class="comment-footer">
@@ -151,7 +152,7 @@ const nameInput = document.querySelector(".add-form-name");
 
     // Обработчик клика на лайк
     function handleLikeClick(event) {
-      event.stopPropagation(); 
+      event.stopPropagation(); // Предотвращаем всплытие события
       const index = event.target.dataset.index;
       comments[index].isLiked = !comments[index].isLiked;
       comments[index].likes += comments[index].isLiked ? 1 : -1;
@@ -162,22 +163,17 @@ const nameInput = document.querySelector(".add-form-name");
     function handleCommentClick(event) {
       const index = event.target.dataset.index;
       const comment = comments[index];
-      nameInput.value = comment.name;
+      // Используем оригинальный текст из массива comments
       commentInput.value = `> ${comment.text}\n`;
     }
 
-    // Обработчики полей ввода
+    // Обработчики полей ввода (теперь только логирование для отладки)
     function handleNameInputChange() {
-      nameInput.value = escapeHTML(nameInput.value);
-    }
-
-    // Обработчики полей ввода
-    function handleNameInputChange() {
-      nameInput.value = escapeHTML(nameInput.value);
+      // console.log("Имя изменено:", nameInput.value);
     }
 
     function handleCommentInputChange() {
-      commentInput.value = escapeHTML(commentInput.value);
+      // console.log("Комментарий изменено:", commentInput.value);
     }
 
     // Обработчик отправки формы
@@ -190,47 +186,7 @@ const nameInput = document.querySelector(".add-form-name");
         return;
       }
 
-      name = escapeHTML(name);
-      text = escapeHTML(text);
-
-      comments.push({
-        name: name,
-        date: getCurrentDateTime(),
-        text: text,
-        likes: 0,
-        isLiked: false,
-      });
-
-      renderComments();
-      nameInput.value = "";
-      commentInput.value = "";
-    }
-
-    // Привязка обработчиков
-    nameInput.addEventListener("input", handleNameInputChange);
-    commentInput.addEventListener("input", handleCommentInputChange);
-    addButton.addEventListener("click", handleAddButtonClick);
-
-    renderComments();
-
-    renderComments();
-
-    // Рендерим начальные комментарии
-    renderComments();
-    function handleCommentInputChange() {
-      commentInput.value = escapeHTML(commentInput.value);
-    }
-
-    // Обработчик отправки формы
-    function handleAddButtonClick() {
-      let name = nameInput.value.trim();
-      let text = commentInput.value.trim();
-
-      if (!name || !text) {
-        alert("Заполните все поля!");
-        return;
-      }
-
+      // Экранируем данные перед добавлением в массив
       name = escapeHTML(name);
       text = escapeHTML(text);
 
