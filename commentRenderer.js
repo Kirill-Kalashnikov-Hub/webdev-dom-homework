@@ -1,15 +1,19 @@
-import { comments } from './data.js';
+import { comments } from "./data.js";
+
 const commentsList = document.querySelector(".comments");
 
 export function renderComments() {
-    commentsList.innerHTML = "";
+  commentsList.innerHTML = "";
 
-    comments.forEach((comment, index) => {
-        const commentHTML = `
+  comments.forEach((comment, index) => {
+    // Получаем дату из объекта комментария
+    const commentDate = comment.date;
+
+    const commentHTML = `
         <li class="comment">
           <div class="comment-header">
             <div>${comment.name}</div>
-            <div>${comment.date}</div>
+            <div>${commentDate}</div>
           </div>
           <div class="comment-body">
             <div class="comment-text" data-index="${index}">
@@ -24,6 +28,6 @@ export function renderComments() {
           </div>
         </li>
       `;
-        commentsList.innerHTML += commentHTML;
-    });
+    commentsList.innerHTML += commentHTML;
+  });
 }
