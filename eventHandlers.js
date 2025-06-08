@@ -8,6 +8,8 @@ export function initializeEventHandlers() {
   const commentInput = document.querySelector(".add-form-text");
   const addButton = document.querySelector(".add-form-button");
   const commentsList = document.querySelector(".comments");
+  const addForm = document.querySelector(".add-form");
+  const loadingIndicator = document.querySelector(".form-loading");
 
   // Обработчик клика на лайк
   const handleLikeClick = (event) => {
@@ -44,6 +46,10 @@ export function initializeEventHandlers() {
     name = escapeHTML(name);
     text = escapeHTML(text);
 
+    // Показываем индикатор загрузки и скрываем форму
+    loadingIndicator.style.display = "block";
+    addForm.style.display = "none";
+
     try {
       await postComment(text, name); // Отправляем комментарий на сервер
 
@@ -64,6 +70,10 @@ export function initializeEventHandlers() {
     } catch (error) {
       console.error("Ошибка при отправке комментария:", error);
       alert("Произошла ошибка при отправке комментария.");
+    } finally {
+      // Скрываем индикатор загрузки и показываем форму после успешной отправки или в случае ошибки
+      loadingIndicator.style.display = "none";
+      addForm.style.display = "flex"; // Или "block", в зависимости от вашего стиля
     }
   };
 
@@ -82,3 +92,7 @@ export function initializeEventHandlers() {
     }
   });
 }
+
+// При инициализации показываем форму
+document.querySelector(".form-loading").style.display = "none";
+document.querySelector(".add-form").style.display = "flex";
