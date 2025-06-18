@@ -68,8 +68,32 @@ export function initializeEventHandlers() {
       nameInput.value = "";
       commentInput.value = "";
     } catch (error) {
-      console.error("Ошибка при отправке комментария:", error);
-      alert("Произошла ошибка при отправке комментария.");
+      loadingIndicator.style.display = "none";
+      addForm.style.display = "flex";
+
+      if (error.message === "Failed to fetch") {
+        alert("Нет интернета, попробуйте снова");
+      }
+
+      if (error.message === "Ошибка сервера") {
+        alert("Ошибка сервера");
+      }
+
+      if (error.message === "Неверный запрос") {
+        alert("Имя и комментарий должны быть не менее 3-х символов");
+        // Добавляем классы ошибки к полям
+        nameInput.classList.add("-error");
+        commentInput.classList.add("-error");
+
+        // Удаляем классы ошибки через 2 секунды
+        setTimeout(() => {
+          nameInput.classList.remove("-error");
+          commentInput.classList.remove("-error");
+        }, 2000);
+      } else {
+        // Если это другая ошибка, выводим сообщение по умолчанию
+        alert("Произошла ошибка при отправке комментария.");
+      }
     } finally {
       // Скрываем индикатор загрузки и показываем форму после успешной отправки или в случае ошибки
       loadingIndicator.style.display = "none";
