@@ -1,7 +1,7 @@
 import { escapeHTML, getCurrentDateTime } from "./utils.js";
 import { comments, updateComments } from "./data.js";
 import { renderComments } from "./commentRenderer.js";
-import { postComment } from "./api.js";
+import { fetchComments, postComment } from "./api.js"; // Ensure fetchComments is imported
 
 export function initializeEventHandlers() {
   const nameInput = document.querySelector(".add-form-name");
@@ -94,10 +94,11 @@ export function initializeEventHandlers() {
         // Если это другая ошибка, выводим сообщение по умолчанию
         alert("Произошла ошибка при отправке комментария.");
       }
+      console.error("Произошла ошибка:", error); // Выводим ошибку в консоль
     } finally {
       // Скрываем индикатор загрузки и показываем форму после успешной отправки или в случае ошибки
       loadingIndicator.style.display = "none";
-      addForm.style.display = "flex"; // Или "block", в зависимости от вашего стиля
+      addForm.style.display = "flex"; // Или "block", в зависимости от стиля
     }
   };
 
@@ -115,6 +116,22 @@ export function initializeEventHandlers() {
       handleCommentClick(event);
     }
   });
+
+  loadingIndicator.style.display = "block";
+  addForm.style.display = "none";
+  fetchComments()
+    .then((initialComments) => {
+      updateComments(initialComments);
+      renderComments();
+    })
+    .catch((error) => {
+      console.error("Ошибка при загрузке комментариев:", error);
+      alert("Не удалось загрузить комментарии. Пожалуйста, попробуйте позже.");
+    })
+    .finally(() => {
+      loadingIndicator.style.display = "none";
+      addForm.style.display = "flex";
+    });
 }
 
 // При инициализации показываем форму

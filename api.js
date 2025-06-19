@@ -1,9 +1,15 @@
-const host = " https://wedev-api.sky.pro/api/v1/kirill-kalashnikov-hub";
+const host = "https://wedev-api.sky.pro/api/v1/kirill-kalashnikov-hub";
 
 export const fetchComments = () => {
   return fetch(host + "/comments")
-    .then((res) => {
-      return res.json();
+    .then((response) => {
+      if (response.status === 500) {
+        throw new Error(`Ошибка сервера: ${response.status}`);
+      }
+      if (!response.ok) {
+        throw new Error(`Network response was not ok: ${response.status}`);
+      }
+      return response.json();
     })
     .then((responseData) => {
       const appComments = responseData.comments.map((comment) => {
@@ -18,6 +24,10 @@ export const fetchComments = () => {
       });
 
       return appComments;
+    })
+    .catch((error) => {
+      console.error("Ошибка при получении комментариев:", error);
+      throw error;
     });
 };
 
@@ -27,7 +37,6 @@ export const postComment = (text, name) => {
     body: JSON.stringify({
       text,
       name,
-      date: new Date().toISOString(), // Передаем дату в формате ISO 8601
     }),
   })
     .then((response) => {
@@ -45,5 +54,9 @@ export const postComment = (text, name) => {
     })
     .then(() => {
       return fetchComments();
+    })
+    .catch((error) => {
+      console.error("Ошибка при отправке комментария:", error);
+      throw error;
     });
 };
