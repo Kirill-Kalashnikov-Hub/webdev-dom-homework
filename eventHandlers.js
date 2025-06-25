@@ -1,24 +1,19 @@
-import { escapeHTML, getCurrentDateTime } from "./utils.js";
 import { comments, updateComments } from "./data.js";
 import { renderComments } from "./commentRenderer.js";
-import { fetchComments, postComment } from "./api.js"; // Ensure fetchComments is imported
+import { fetchComments, postComment } from "./api.js";
 
 export function initializeEventHandlers() {
-  const nameInput = document.querySelector(".add-form-name");
   const commentInput = document.querySelector(".add-form-text");
   const addButton = document.querySelector(".add-form-button");
   const commentsList = document.querySelector(".comments");
-  const addForm = document.querySelector(".add-form");
-  const loadingIndicator = document.querySelector(".form-loading");
 
   // Обработчик клика на лайк
   const handleLikeClick = (event) => {
-    event.stopPropagation();
     const index = event.target.dataset.index;
-    const newComments = [...comments]; // Создаем копию массива
+    const newComments = [...comments];
     newComments[index].isLiked = !newComments[index].isLiked;
     newComments[index].likes += newComments[index].isLiked ? 1 : -1;
-    updateComments(newComments); // Обновляем массив комментариев
+    updateComments(newComments);
     renderComments();
   };
 
@@ -29,111 +24,44 @@ export function initializeEventHandlers() {
     commentInput.value = `> ${comment.text}\n`;
   };
 
-  function handleNameInputChange() {}
-
-  function handleCommentInputChange() {}
-
-  // Обработчик отправки формы
+  // Обработчик отправки комментария
   const handleAddButtonClick = async () => {
-    let name = nameInput.value.trim();
-    let text = commentInput.value.trim();
+    const text = commentInput.value.trim();
 
-    if (!name || !text) {
-      alert("Заполните все поля!");
+    if (!text) {
+      alert("Комментарий не может быть пустым");
       return;
     }
 
-    name = escapeHTML(name);
-    text = escapeHTML(text);
-
-    // Показываем индикатор загрузки и скрываем форму
-    loadingIndicator.style.display = "block";
-    addForm.style.display = "none";
+    const loadingElement = document.querySelector(".form-loading");
+    loadingElement.style.display = "block";
 
     try {
-      await postComment(text, name); // Отправляем комментарий на сервер
-
-      const newComment = {
-        name: name,
-        date: getCurrentDateTime(),
-        text: text,
-        likes: 0,
-        isLiked: false,
-      };
-
-      const newComments = [...comments, newComment]; // Создаем копию массива и добавляем новый комментарий
-      updateComments(newComments); // Обновляем массив комментариев
-      renderComments(); // Обновляем отображение комментариев
-
-      nameInput.value = "";
+      await postComment(text);
+      const newComments = await fetchComments();
+      updateComments(newComments);
+      renderComments();
       commentInput.value = "";
     } catch (error) {
-      loadingIndicator.style.display = "none";
-      addForm.style.display = "flex";
-
-      if (error.message === "Failed to fetch") {
-        alert("Нет интернета, попробуйте снова");
-      }
-
-      if (error.message === "Ошибка сервера") {
-        alert("Ошибка сервера");
-      }
-
-      if (error.message === "Неверный запрос") {
-        alert("Имя и комментарий должны быть не менее 3-х символов");
-        // Добавляем классы ошибки к полям
-        nameInput.classList.add("-error");
-        commentInput.classList.add("-error");
-
-        // Удаляем классы ошибки через 2 секунды
-        setTimeout(() => {
-          nameInput.classList.remove("-error");
-          commentInput.classList.remove("-error");
-        }, 2000);
-      } else {
-        // Если это другая ошибка, выводим сообщение по умолчанию
-        alert("Произошла ошибка при отправке комментария.");
-      }
-      console.error("Произошла ошибка:", error); // Выводим ошибку в консоль
+      alert(error.message);
     } finally {
-      // Скрываем индикатор загрузки и показываем форму после успешной отправки или в случае ошибки
-      loadingIndicator.style.display = "none";
-      addForm.style.display = "flex"; // Или "block", в зависимости от стиля
+      loadingElement.style.display = "none";
     }
   };
 
-  // Привязка обработчиков
-  nameInput.addEventListener("input", handleNameInputChange);
-  commentInput.addEventListener("input", handleCommentInputChange);
-  addButton.addEventListener("click", handleAddButtonClick);
+  // Обработчики для комментариев
+  if (addButton) {
+    addButton.addEventListener("click", handleAddButtonClick);
+  }
 
-  // Обработчик событий на списке комментариев
-  commentsList.addEventListener("click", (event) => {
-    if (event.target.classList.contains("like-button")) {
-      handleLikeClick(event);
-    }
-    if (event.target.classList.contains("comment-text")) {
-      handleCommentClick(event);
-    }
-  });
-
-  loadingIndicator.style.display = "block";
-  addForm.style.display = "none";
-  fetchComments()
-    .then((initialComments) => {
-      updateComments(initialComments);
-      renderComments();
-    })
-    .catch((error) => {
-      console.error("Ошибка при загрузке комментариев:", error);
-      alert("Не удалось загрузить комментарии. Пожалуйста, попробуйте позже.");
-    })
-    .finally(() => {
-      loadingIndicator.style.display = "none";
-      addForm.style.display = "flex";
+  if (commentsList) {
+    commentsList.addEventListener("click", (event) => {
+      if (event.target.classList.contains("like-button")) {
+        handleLikeClick(event);
+      }
+      if (event.target.classList.contains("comment-text")) {
+        handleCommentClick(event);
+      }
     });
+  }
 }
-
-// При инициализации показываем форму
-document.querySelector(".form-loading").style.display = "none";
-document.querySelector(".add-form").style.display = "flex";
