@@ -1,4 +1,4 @@
-const personalKey = "kirill-kalashnikov-hub"
+const personalKey = "nikolay-skorikov"
 const apiUrl = `https://wedev-api.sky.pro/api/v2/${personalKey}/comments`
 const authUrl = `https://wedev-api.sky.pro/api/user/login`
 
@@ -25,7 +25,7 @@ export async function postCommentToAPI({ text, token }) {
     }
 
     return response.json()
-} 
+}
 
 export async function loginUser({ login, password }) {
     const response = await fetch(authUrl, {
