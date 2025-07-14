@@ -40,24 +40,26 @@ export function renderComments() {
             </div>
         `
 
-        commentItem
-            .querySelector(".comment-text")
-            .addEventListener("click", () => {
-                setupQuote(comment)
-            })
+        // Добавил обработчик в случае если пользователь авторизован
+        if (authData) {
+            commentItem
+                .querySelector(".comment-text")
+                .addEventListener("click", () => {
+                    setupQuote(comment)
+                })
 
-        const likeButton = commentItem.querySelector(".like-button")
-        if (likeButton) {
-            likeButton.addEventListener("click", (e) => {
-                e.stopPropagation()
-                toggleLike(parseInt(e.target.dataset.index))
-            })
+            const likeButton = commentItem.querySelector(".like-button")
+            if (likeButton) {
+                likeButton.addEventListener("click", (e) => {
+                    e.stopPropagation()
+                    toggleLike(parseInt(e.target.dataset.index))
+                })
+            }
         }
 
         commentsList.appendChild(commentItem)
     })
 
-    // Обновляем отображение формы в зависимости от авторизации
     updateAuthState()
 }
 
